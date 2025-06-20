@@ -1,4 +1,3 @@
-import React from "react";
 import { Badge } from "../../../../components/ui/badge";
 import { Card } from "../../../../components/ui/card";
 
@@ -6,7 +5,7 @@ export const AiFeaturesSection = (): JSX.Element => {
   // Feature data for mapping
   const features = [
     {
-      icon: "/group-2.png",
+      icon: "/mingcute-cardboard-vr-fill.svg",
       title: "VR Training Modules",
       description:
         "Immersive virtual reality training simulations for emergency procedures and equipment operation without real-world risks.",
@@ -48,35 +47,22 @@ export const AiFeaturesSection = (): JSX.Element => {
 
           <div className="flex flex-col w-[527px] items-start gap-10 relative">
             {features.map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-6 self-stretch w-full"
-              >
-                <div className="relative w-10 h-10 bg-[#ff6b0033] rounded-[10px] overflow-hidden border border-solid border-[#ff6b00]">
-                  {feature.icon.endsWith(".png") ? (
-                    <div className="relative w-6 h-6 top-2 left-2">
-                      <img
-                        className="h-[19px] top-[5px] absolute w-5 left-0.5"
-                        alt={feature.title}
-                        src={feature.icon}
-                      />
-                    </div>
-                  ) : (
-                    <img
-                      className="absolute w-6 h-6 top-2 left-2"
-                      alt={feature.title}
-                      src={feature.icon}
-                    />
-                  )}
-                </div>
+              <div key={index} className="flex items-start gap-6 w-full">
+              <div className="w-10 h-10 bg-[#ff6b0033] rounded-[10px] overflow-hidden border border-solid border-[#ff6b00] relative flex-shrink-0">
+                <img
+                  className="absolute w-6 h-6 top-2 left-2"
+                  alt={feature.title}
+                  src={feature.icon}
+                />
+              </div>
 
-                <div className="inline-flex flex-col items-start gap-3.5">
-                  <h3 className="self-stretch h-[17px] mt-[-1.00px] font-['Inter',Helvetica] font-bold text-white text-base leading-normal whitespace-nowrap">
-                    {feature.title}
-                  </h3>
+              <div className="flex flex-col items-start gap-3.5">
+                <h3 className="font-['Inter',Helvetica] font-bold text-white text-base leading-normal whitespace-nowrap">
+                  {feature.title}
+                </h3>
 
-                  <p className="w-fit font-['Inter',Helvetica] font-medium text-[#ffffffb2] text-sm leading-normal">
-                    {feature.description}
+                <p className="font-['Inter',Helvetica] font-medium text-[#ffffffb2] text-sm leading-normal">
+                  {feature.description}
                   </p>
                 </div>
               </div>
