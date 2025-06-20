@@ -27,7 +27,7 @@ export const NavigationBarSection = (): JSX.Element => {
             <span className="text-[#ff6b00]">Guard</span>
           </div>
 
-          <div className="relative self-stretch [font-family:'Inter',Helvetica] font-medium text-white text-[8px] tracking-[0] leading-[normal]">
+          <div className="relative self-stretch whitespace-nowrap [font-family:'Inter',Helvetica] font-medium text-white text-[8px] tracking-[0] leading-[normal]">
             Advance Coal Mine Management
           </div>
         </div>
