@@ -19,8 +19,8 @@ export const FooterSection = (): JSX.Element => {
 
   // Social media icons data
   const socialIcons = [
-    { src: "/item-2.svg", alt: "Social media icon" },
-    { src: "/item-1.svg", alt: "Social media icon" },
+    { src: "/col.svg", alt: "Social media icon" },
+    { src: "/col-1.svg", alt: "Social media icon" },
     { src: "/item.svg", alt: "Social media icon" },
   ];
 

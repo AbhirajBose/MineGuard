@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "../../../../components/ui/button";
 
 export const CallToActionSection = (): JSX.Element => {
@@ -28,7 +27,7 @@ export const CallToActionSection = (): JSX.Element => {
   ];
 
   return (
-    <section className="flex flex-col items-center justify-center py-[125px] w-full bg-cover bg-center [background:url(..//ready.png)_50%_50%_/_cover]">
+    <section className="flex flex-col items-center justify-center py-[125px] w-full bg-cover bg-center [background:url(/Readyframe.png)_50%_50%_/_cover]">
       <div className="flex flex-col items-center justify-center gap-[50px] max-w-4xl mx-auto text-center">
         <h2 className="font-['Inter',Helvetica] font-bold text-white text-5xl">
           Ready to Transform Your Mining <br />
