@@ -6,14 +6,20 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 const port = process.env.PORT || 5001;
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the React app build directory in production
+if (isProduction) {
+  app.use(express.static(path.join(__dirname, '../dist')));
+}
+
 // MongoDB Connection
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/mineguard';
-console.log('Attempting to connect to MongoDB with URI:', uri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')); // Hide credentials in logs
+const uri = 'mongodb+srv://ranaop:mineguard@cluster0.3t2jb0n.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+console.log('Attempting to connect to MongoDB Atlas...');
 
 const client = new MongoClient(uri);
 let db;
@@ -22,15 +28,14 @@ async function connectDB() {
   try {
     await client.connect();
     db = client.db("mineguard");
-    console.log("✅ Successfully connected to MongoDB!");
+    console.log("✅ Successfully connected to MongoDB Atlas!");
     
     // Test the connection
     await db.admin().ping();
     console.log("✅ MongoDB connection is healthy!");
   } catch (err) {
     console.error("❌ Failed to connect to MongoDB:", err.message);
-    console.log("💡 Make sure MongoDB is running and MONGODB_URI is set correctly in your .env file");
-    console.log("💡 For local development, you can start MongoDB with: mongod");
+    console.log("💡 Please check your MongoDB Atlas connection string");
     process.exit(1);
   }
 }
@@ -38,8 +43,13 @@ async function connectDB() {
 connectDB();
 
 // API Routes
-app.get('/', (req, res) => {
-  res.send('MineGuard Server is running!');
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'MineGuard Server is running!',
+    mongodb: 'connected',
+    environment: isProduction ? 'production' : 'development'
+  });
 });
 
 // Get all logs
@@ -88,6 +98,17 @@ app.post('/api/logs', async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
+  console.log(`Environment: ${isProduction ? 'Production' : 'Development'}`);
+  if (isProduction) {
+    console.log(`Frontend served from: ${path.join(__dirname, '../dist')}`);
+  }
 });
+
+// Catch-all handler for React Router in production
+if (isProduction) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../dist/index.html'));
+  });
+}
 
 module.exports = app; 
