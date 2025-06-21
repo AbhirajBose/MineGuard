@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Input } from "./ui/input";
 
 // Custom Icon component for using SVG files from public folder
 const Icon = ({ name, className, ...props }: { name: string; className?: string; [key: string]: any }) => {
@@ -70,34 +69,21 @@ export const MainMenu = ({ className, onMenuItemClick, selectedItem = "Dashboard
 
   return (
     <nav className={`flex flex-col h-screen transition-all duration-300 ${
-      isCollapsed ? 'w-16' : 'w-[237px]'
-    } py-4 px-[27px] bg-[#2c2c2c] ${className || ''}`}>
+      isCollapsed ? 'w-24' : 'w-[237px]'
+    } py-4 ${isCollapsed ? 'px-4' : 'px-[27px]'} bg-[#2c2c2c] ${className || ''}`}>
       <div className="flex flex-col w-full items-start gap-6">
         {/* Toggle button for responsive behavior */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="self-end p-1 rounded hover:bg-[#3c3c3c] transition-colors"
+          className="self-end p-1 rounded-full hover:bg-[#3c3c3c] transition-colors"
         >
-          <Icon name="maki-arrow" className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} />
+          <Icon name="maki-arrow" className={`w-5 h-5 text-white transition-transform duration-300 ${!isCollapsed ? 'rotate-90' : '-rotate-90'}`} />
         </button>
 
-        {/* Search bar - hidden when collapsed */}
-        {!isCollapsed && (
-          <div className="relative w-full h-[30px] bg-[#1e1e1e] rounded-[30px] overflow-hidden">
-            <div className="flex items-center gap-[5px] absolute top-1.5 left-[11px] w-[calc(100%-22px)]">
-              <Icon name="mage-dashboard-2-fill" className="w-[18px] h-[18px] text-[#ffffff99]" />
-              <Input
-                className="h-6 px-0 border-0 bg-transparent text-xs text-[#ffffff99] font-['Poppins',Helvetica] placeholder:text-[#ffffff99] focus-visible:ring-0 focus-visible:ring-offset-0"
-                placeholder="Search"
-              />
-            </div>
-          </div>
-        )}
-
         {/* Main Menu Items */}
-        <div className="flex flex-col w-full items-start gap-2">
+        <div className="flex flex-col w-full items-start gap-2 mt-4">
           {!isCollapsed && (
-            <h3 className="font-['Poppins',Helvetica] font-medium text-[#ffffff99] text-[10px]">
+            <h3 className="font-['Poppins',Helvetica] font-medium text-[#ffffff99] text-[10px] px-2">
               MAIN
             </h3>
           )}
@@ -106,9 +92,9 @@ export const MainMenu = ({ className, onMenuItemClick, selectedItem = "Dashboard
             {mainMenuItems.map((item, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-2 w-full cursor-pointer hover:opacity-80 p-2 rounded transition-colors ${
+                className={`flex items-center gap-4 w-full cursor-pointer hover:opacity-80 p-2 rounded transition-colors ${
                   isItemSelected(item.label) ? 'bg-[#ff6b00] bg-opacity-20' : 'hover:bg-[#3c3c3c]'
-                }`}
+                } ${isCollapsed ? 'justify-center' : ''}`}
                 onClick={() => handleMenuItemClick(item.label)}
                 title={isCollapsed ? item.label : undefined}
               >
@@ -128,7 +114,7 @@ export const MainMenu = ({ className, onMenuItemClick, selectedItem = "Dashboard
         {/* Tools Menu Items */}
         <div className="flex flex-col w-full items-start gap-2">
           {!isCollapsed && (
-            <h3 className="font-['Poppins',Helvetica] font-medium text-[#ffffff99] text-[10px]">
+            <h3 className="font-['Poppins',Helvetica] font-medium text-[#ffffff99] text-[10px] px-2">
               TOOLS
             </h3>
           )}
@@ -137,9 +123,9 @@ export const MainMenu = ({ className, onMenuItemClick, selectedItem = "Dashboard
             {toolsMenuItems.map((item, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-2 w-full cursor-pointer hover:opacity-80 p-2 rounded transition-colors ${
+                className={`flex items-center gap-4 w-full cursor-pointer hover:opacity-80 p-2 rounded transition-colors ${
                   isItemSelected(item.label) ? 'bg-[#ff6b00] bg-opacity-20' : 'hover:bg-[#3c3c3c]'
-                }`}
+                } ${isCollapsed ? 'justify-center' : ''}`}
                 onClick={() => handleMenuItemClick(item.label)}
                 title={isCollapsed ? item.label : undefined}
               >
