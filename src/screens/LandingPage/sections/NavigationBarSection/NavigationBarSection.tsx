@@ -2,15 +2,16 @@ import { Button } from "../../../../components/ui/button";
 
 interface NavigationBarSectionProps {
   onNavigateToDashboard?: () => void;
+  onNavItemClick?: (section: string) => void;
 }
 
-export const NavigationBarSection = ({ onNavigateToDashboard }: NavigationBarSectionProps): JSX.Element => {
+export const NavigationBarSection = ({ onNavigateToDashboard, onNavItemClick }: NavigationBarSectionProps): JSX.Element => {
   // Navigation menu items
   const navItems = [
-    { label: "Features", href: "#" },
-    { label: "Dashboard", href: "#" },
-    { label: "Training", href: "#" },
-    { label: "Safety", href: "#" },
+    { label: "Features", href: "#features" },
+    { label: "Dashboard", href: "#dashboard" },
+    { label: "Training", href: "#training" },
+    { label: "Safety", href: "#safety" },
   ];
 
   const handleLoginClick = () => {
@@ -27,13 +28,13 @@ export const NavigationBarSection = ({ onNavigateToDashboard }: NavigationBarSec
 
   const handleNavItemClick = (e: React.MouseEvent, item: { label: string; href: string }) => {
     e.preventDefault();
-    if (onNavigateToDashboard) {
-      onNavigateToDashboard();
+    if (onNavItemClick) {
+      onNavItemClick(item.label);
     }
   };
 
   return (
-    <nav className="flex items-center justify-between px-20 py-4 relative self-stretch w-full flex-[0_0_auto] bg-[#2c2c2c] border-b-[0.2px] [border-bottom-style:solid] border-white">
+    <nav className="flex items-center justify-between px-20 py-4 sticky top-0 z-50 self-stretch w-full flex-[0_0_auto] bg-[#2c2c2c] border-b-[0.2px] [border-bottom-style:solid] border-white">
       {/* Logo and Brand */}
       <div className="inline-flex items-center gap-2 relative flex-[0_0_auto]">
         <div className="relative w-[30px] h-[30px] bg-[#ff6b00] rounded-md overflow-hidden">

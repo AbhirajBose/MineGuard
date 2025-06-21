@@ -14,10 +14,10 @@ export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
   const { user: civicUser } = useUser();
   
   const statCards = [
-    { title: "Current Shift", value: "Morning", subValue: "6:00 - 14:00", icon: "basil-book-solid" },
-    { title: "Mine Temperature", value: "25.5°C", subValue: "Normal", icon: "game-icons-mine-truck", status: "normal" },
-    { title: "Air Quality", value: "86%", subValue: "Risk", icon: "game-icons-mine-truck", status: "risk" },
-    { title: "Methane Level", value: "1.2%", subValue: "Cautions", icon: "material-symbols-exclamation-rounded", status: "caution" }
+    { title: "Current Shift", value: "Morning", subValue: "6:00 - 14:00", icon: "tabler_clock-filled", status: "info" },
+    { title: "Mine Temperature", value: "25.5°C", subValue: "Normal", icon: "raphael_temp", status: "normal" },
+    { title: "Air Quality", value: "86%", subValue: "Risk", icon: "ic_outline-air", status: "risk" },
+    { title: "Methane Level", value: "1.2%", subValue: "Cautions", icon: "game-icons_poison-gas", status: "caution" }
   ];
 
   const alerts = [
@@ -96,62 +96,72 @@ export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {statCards.map((stat, index) => (
-            <div key={index} className="bg-[#2c2c2c] rounded-lg p-4 border border-gray-700 flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#ff6b00] bg-opacity-20 rounded-lg flex items-center justify-center">
-                <img src={`/${stat.icon}.svg`} alt={stat.title} className="w-5 h-5" />
+          {statCards.map((stat, index) => {
+            let colors = {
+              bg: 'bg-gray-500/10',
+              iconFilter: '',
+              text: 'text-gray-400',
+            };
+            switch (stat.status) {
+              case 'info':
+                colors = { bg: 'bg-blue-500/10', iconFilter: '[filter:invert(48%)_sepia(61%)_saturate(2132%)_hue-rotate(195deg)_brightness(97%)_contrast(92%)]', text: 'text-blue-400' };
+                break;
+              case 'normal':
+                colors = { bg: 'bg-green-500/10', iconFilter: '[filter:invert(59%)_sepia(89%)_saturate(468%)_hue-rotate(85deg)_brightness(93%)_contrast(88%)]', text: 'text-green-400' };
+                break;
+              case 'risk':
+                colors = { bg: 'bg-orange-500/10', iconFilter: '[filter:invert(58%)_sepia(87%)_saturate(1229%)_hue-rotate(359deg)_brightness(99%)_contrast(97%)]', text: 'text-orange-400' };
+                break;
+              case 'caution':
+                colors = { bg: 'bg-red-500/10', iconFilter: '[filter:invert(43%)_sepia(86%)_saturate(1210%)_hue-rotate(331deg)_brightness(96%)_contrast(93%)]', text: 'text-red-400' };
+                break;
+            }
+
+            return (
+              <div key={index} className="bg-[#2c2c2c] rounded-lg p-4 border border-gray-700 flex items-center gap-4">
+                <div className={`w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center`}>
+                  <img src={`/${stat.icon}.svg`} alt={stat.title} className={`w-5 h-5 ${colors.iconFilter}`} />
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">{stat.title}</p>
+                  <p className="text-lg font-semibold text-white">{stat.value}</p>
+                  <p className={`text-sm ${stat.status === 'info' ? 'text-gray-400' : colors.text}`}>{stat.subValue}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-gray-400 text-sm">{stat.title}</p>
-                <p className="text-lg font-semibold text-white">{stat.value}</p>
-                <p className={`text-sm ${
-                  stat.status === 'normal' ? 'text-green-400' :
-                  stat.status === 'risk' ? 'text-yellow-400' :
-                  stat.status === 'caution' ? 'text-red-400' :
-                  'text-gray-400'
-                }`}>{stat.subValue}</p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left and Middle sections */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            {/* Worker's Dashboard - Attendance Heatmap */}
+            {/* Worker's Present Today */}
             <div className="bg-[#2c2c2c] rounded-lg p-6 border border-gray-700">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Worker's Dashboard</h2>
+                <h2 className="text-xl font-semibold text-white">Workers Present Today</h2>
+                <span className="text-gray-400 text-sm">Total: 5</span>
               </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-end gap-2 text-xs text-gray-400 pr-8">
-                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => (
-                    <div key={month} className="w-10 text-center">{month}</div>
-                  ))}
-                </div>
-                {daysOfWeek.map((day, dayIndex) => (
-                  <div key={day.key} className="flex items-center gap-2">
-                    <div className="w-8 text-sm text-gray-400">{day.label}</div>
-                    <div className="grid grid-cols-12 gap-1 flex-1">
-                      {Array.from({ length: 12 }).map((_, monthIndex) => {
-                        const value = Math.random();
-                        let bgColor = 'bg-gray-700';
-                        if (value > 0.3) bgColor = 'bg-green-800';
-                        if (value > 0.6) bgColor = 'bg-green-600';
-                        if (value > 0.8) bgColor = 'bg-green-400';
-                        return <div key={`${day.key}-${monthIndex}`} className={`w-full h-6 rounded-sm ${bgColor}`} title={`Attendance: ${value > 0.3 ? 'Present' : 'Absent'}`} />;
-                      })}
+              <div className="space-y-4">
+                {[
+                  { name: "John Doe", id: "W001", status: "Present" },
+                  { name: "Jane Smith", id: "W002", status: "Present" },
+                  { name: "Mike Johnson", id: "W003", status: "Present" },
+                  { name: "Emily Davis", id: "W004", status: "Present" },
+                  { name: "Chris Brown", id: "W005", status: "Present" },
+                ].map((worker) => (
+                  <div key={worker.id} className="flex items-center justify-between p-3 bg-[#1e1e1e] rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <User className="w-5 h-5 text-gray-400" />
+                      <div>
+                        <p className="font-semibold text-white">{worker.name}</p>
+                        <p className="text-xs text-gray-500">{worker.id}</p>
+                      </div>
                     </div>
+                    <span className="px-3 py-1 text-xs font-semibold text-green-300 bg-green-900/50 rounded-full">
+                      {worker.status}
+                    </span>
                   </div>
                 ))}
-              </div>
-              <div className="flex justify-end items-center gap-4 mt-4 text-sm">
-                  <span className="text-gray-400">Absent</span>
-                  <div className="w-4 h-4 bg-gray-700 rounded-sm" />
-                  <span className="text-gray-400">Present</span>
-                  <div className="w-4 h-4 bg-green-800 rounded-sm" />
-                  <div className="w-4 h-4 bg-green-600 rounded-sm" />
-                  <div className="w-4 h-4 bg-green-400 rounded-sm" />
               </div>
             </div>
 

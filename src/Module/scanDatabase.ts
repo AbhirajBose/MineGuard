@@ -1,4 +1,5 @@
 import { ScanResult } from './geminiService';
+import { browserDatabase } from './browserDatabase';
 
 export interface ScanSession {
   id: string;
@@ -10,16 +11,35 @@ export interface ScanSession {
 }
 
 class ScanDatabase {
-  private readonly STORAGE_KEY = 'mineguard_scans';
-  private readonly MAX_SCANS = 100; // Keep only last 100 scans
+  private readonly COLLECTION_NAME = 'scans';
 
-  private getStoredScans(): ScanSession[] {
+  async saveScanSession(session: ScanSession): Promise<void> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      if (!stored) return [];
+      // Convert Date objects to ISO strings for storage
+      const sessionToSave = {
+        ...session,
+        timestamp: session.timestamp.toISOString(),
+        results: session.results.map(result => ({
+          ...result,
+          timestamp: result.timestamp.toISOString()
+        }))
+      };
       
-      const scans = JSON.parse(stored);
-      // Convert string dates back to Date objects
+      await browserDatabase.insertOne(this.COLLECTION_NAME, sessionToSave);
+    } catch (error) {
+      console.error('Error saving scan session to database:', error);
+      throw error;
+    }
+  }
+
+  async getRecentScans(limit: number = 10): Promise<ScanSession[]> {
+    try {
+      const scans = await browserDatabase.find(this.COLLECTION_NAME, {}, {
+        sort: { timestamp: -1 },
+        limit: limit
+      });
+
+      // Convert ISO strings back to Date objects
       return scans.map((scan: any) => ({
         ...scan,
         timestamp: new Date(scan.timestamp),
@@ -29,45 +49,47 @@ class ScanDatabase {
         }))
       }));
     } catch (error) {
-      console.error('Error loading scans from localStorage:', error);
+      console.error('Error loading scans from database:', error);
       return [];
     }
   }
 
-  private saveScans(scans: ScanSession[]): void {
+  async getScanById(id: string): Promise<ScanSession | null> {
     try {
-      // Keep only the most recent scans
-      const recentScans = scans.slice(-this.MAX_SCANS);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(recentScans));
+      const scan = await browserDatabase.findOne(this.COLLECTION_NAME, { id });
+      if (!scan) return null;
+
+      // Convert ISO strings back to Date objects
+      return {
+        ...scan,
+        timestamp: new Date(scan.timestamp),
+        results: scan.results.map((result: any) => ({
+          ...result,
+          timestamp: new Date(result.timestamp)
+        }))
+      };
     } catch (error) {
-      console.error('Error saving scans to localStorage:', error);
+      console.error('Error loading scan from database:', error);
+      return null;
     }
   }
 
-  async saveScanSession(session: ScanSession): Promise<void> {
-    const scans = this.getStoredScans();
-    scans.push(session);
-    this.saveScans(scans);
-  }
-
-  async getRecentScans(limit: number = 10): Promise<ScanSession[]> {
-    const scans = this.getStoredScans();
-    return scans.slice(-limit).reverse(); // Most recent first
-  }
-
-  async getScanById(id: string): Promise<ScanSession | null> {
-    const scans = this.getStoredScans();
-    return scans.find(scan => scan.id === id) || null;
-  }
-
   async deleteScan(id: string): Promise<void> {
-    const scans = this.getStoredScans();
-    const filteredScans = scans.filter(scan => scan.id !== id);
-    this.saveScans(filteredScans);
+    try {
+      await browserDatabase.deleteOne(this.COLLECTION_NAME, { id });
+    } catch (error) {
+      console.error('Error deleting scan from database:', error);
+      throw error;
+    }
   }
 
   async clearAllScans(): Promise<void> {
-    localStorage.removeItem(this.STORAGE_KEY);
+    try {
+      await browserDatabase.deleteMany(this.COLLECTION_NAME, {});
+    } catch (error) {
+      console.error('Error clearing all scans from database:', error);
+      throw error;
+    }
   }
 
   async getScanStats(): Promise<{
@@ -76,40 +98,70 @@ class ScanDatabase {
     failedScans: number;
     successRate: number;
   }> {
-    const scans = this.getStoredScans();
-    const totalScans = scans.length;
-    const passedScans = scans.filter(scan => scan.overallPassed).length;
-    const failedScans = totalScans - passedScans;
-    const successRate = totalScans > 0 ? (passedScans / totalScans) * 100 : 0;
+    try {
+      const totalScans = await browserDatabase.countDocuments(this.COLLECTION_NAME);
+      const passedScans = await browserDatabase.countDocuments(this.COLLECTION_NAME, { overallPassed: true });
+      const failedScans = totalScans - passedScans;
+      const successRate = totalScans > 0 ? (passedScans / totalScans) * 100 : 0;
 
-    return {
-      totalScans,
-      passedScans,
-      failedScans,
-      successRate
-    };
+      return {
+        totalScans,
+        passedScans,
+        failedScans,
+        successRate
+      };
+    } catch (error) {
+      console.error('Error getting scan stats from database:', error);
+      return {
+        totalScans: 0,
+        passedScans: 0,
+        failedScans: 0,
+        successRate: 0
+      };
+    }
   }
 
   async getEquipmentStats(): Promise<Record<string, { passed: number; failed: number; total: number }>> {
-    const scans = this.getStoredScans();
-    const stats: Record<string, { passed: number; failed: number; total: number }> = {};
+    try {
+      const pipeline = [
+        { $unwind: '$results' },
+        {
+          $group: {
+            _id: '$results.equipmentName',
+            total: { $sum: 1 },
+            passed: {
+              $sum: {
+                $cond: ['$results.isPresent', 1, 0]
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            equipmentName: '$_id',
+            total: 1,
+            passed: 1,
+            failed: { $subtract: ['$total', '$passed'] }
+          }
+        }
+      ];
 
-    scans.forEach(scan => {
-      scan.results.forEach(result => {
-        if (!stats[result.equipmentName]) {
-          stats[result.equipmentName] = { passed: 0, failed: 0, total: 0 };
-        }
-        
-        stats[result.equipmentName].total++;
-        if (result.isPresent) {
-          stats[result.equipmentName].passed++;
-        } else {
-          stats[result.equipmentName].failed++;
-        }
+      const stats = await browserDatabase.aggregate(this.COLLECTION_NAME, pipeline);
+      
+      const result: Record<string, { passed: number; failed: number; total: number }> = {};
+      stats.forEach((stat: any) => {
+        result[stat.equipmentName] = {
+          passed: stat.passed,
+          failed: stat.failed,
+          total: stat.total
+        };
       });
-    });
 
-    return stats;
+      return result;
+    } catch (error) {
+      console.error('Error getting equipment stats from database:', error);
+      return {};
+    }
   }
 }
 

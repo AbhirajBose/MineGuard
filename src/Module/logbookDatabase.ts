@@ -1,6 +1,9 @@
+const API_BASE_URL = 'http://localhost:5001/api';
+
 export interface LogbookEntry {
-  id: string;
-  type: string; // e.g. "Equipment Maintenance", "Safety Inspection", "Incident Report", "OCR Document"
+  _id?: string; // MongoDB adds an _id
+  id?: string;
+  type: string;
   date: Date;
   operator: string;
   filename?: string;
@@ -8,42 +11,40 @@ export interface LogbookEntry {
 }
 
 class LogbookDatabase {
-  private readonly STORAGE_KEY = 'mineguard_logbook_entries';
-  private readonly MAX_ENTRIES = 200;
-
-  private getStoredEntries(): LogbookEntry[] {
+  async saveLogEntry(entry: Omit<LogbookEntry, 'date' | '_id' | 'id'>): Promise<LogbookEntry> {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
-      if (!stored) return [];
-      const entries = JSON.parse(stored);
+      const response = await fetch(`${API_BASE_URL}/logs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entry),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to save log entry');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error saving logbook entry to server:', error);
+      throw error;
+    }
+  }
+
+  async getRecentLogEntries(limit: number = 50): Promise<LogbookEntry[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/logs?limit=${limit}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch log entries');
+      }
+      const entries = await response.json();
       return entries.map((entry: any) => ({
         ...entry,
         date: new Date(entry.date),
       }));
     } catch (error) {
-      console.error('Error loading logbook entries from localStorage:', error);
+      console.error('Error loading logbook entries from server:', error);
       return [];
     }
-  }
-
-  private saveEntries(entries: LogbookEntry[]): void {
-    try {
-      const recentEntries = entries.slice(-this.MAX_ENTRIES);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(recentEntries));
-    } catch (error) {
-      console.error('Error saving logbook entries to localStorage:', error);
-    }
-  }
-
-  async saveLogEntry(entry: LogbookEntry): Promise<void> {
-    const entries = this.getStoredEntries();
-    entries.push(entry);
-    this.saveEntries(entries);
-  }
-
-  async getRecentLogEntries(limit: number = 50): Promise<LogbookEntry[]> {
-    const entries = this.getStoredEntries();
-    return entries.slice(-limit).reverse(); // most recent first
   }
 }
 

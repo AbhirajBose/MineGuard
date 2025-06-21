@@ -65,12 +65,25 @@ export const DashboardAdmins = ({ user, onLogout, onNavigateToLanding }: Dashboa
 
   return (
     <div className="bg-[#1e1e1e] flex flex-col w-full min-h-screen">
-      <DashNav user={user} onLogout={onLogout} />
-      <div className="flex flex-1">
-        <aside className="h-full">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50">
+        <DashNav user={user} onLogout={onLogout} />
+      </div>
+      
+      {/* Main Content Area */}
+      <div className="flex flex-1 relative">
+        {/* Sticky Sidebar - Hidden on mobile, shown on desktop */}
+        <aside className="hidden lg:block sticky top-0 h-screen z-40">
           <MainMenuSection onMenuItemClick={handleMenuClick} selectedItem={currentPage} />
         </aside>
-        <main className="flex-1 flex flex-col overflow-auto">
+        
+        {/* Mobile Menu - Always rendered but controlled by MainMenu component */}
+        <aside className="lg:hidden">
+          <MainMenuSection onMenuItemClick={handleMenuClick} selectedItem={currentPage} />
+        </aside>
+        
+        {/* Scrollable Main Content */}
+        <main className="flex-1 flex flex-col overflow-auto min-h-screen w-full lg:ml-0">
           {renderCurrentPage()}
         </main>
       </div>

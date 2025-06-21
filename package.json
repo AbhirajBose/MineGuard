@@ -5,7 +5,9 @@
   "name": "MineGuard",
   "description": "A MineGuard Web App, built with React and Tailwind CSS, and use to manage the Mine System",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\"",
+    "dev:frontend": "vite",
+    "dev:backend": "npm start --prefix server",
     "build": "vite build"
   },
   "dependencies": {
@@ -21,7 +23,6 @@
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.453.0",
-    "mongodb": "^6.17.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
@@ -31,6 +32,7 @@
     "@types/react": "18.2.0",
     "@types/react-dom": "18.2.0",
     "@vitejs/plugin-react": "4.3.4",
+    "concurrently": "^9.1.2",
     "esbuild": "0.24.0",
     "globals": "15.12.0",
     "tailwindcss": "3.4.16",
