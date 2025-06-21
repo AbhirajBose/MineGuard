@@ -9,7 +9,7 @@ export const NavigationBarSection = ({ onNavigateToDashboard }: NavigationBarSec
   const navItems = [
     { label: "Features", href: "#" },
     { label: "Dashboard", href: "#" },
-    { label: "Tranning", href: "#" }, // Keeping the typo as in original
+    { label: "Training", href: "#" },
     { label: "Safety", href: "#" },
   ];
 

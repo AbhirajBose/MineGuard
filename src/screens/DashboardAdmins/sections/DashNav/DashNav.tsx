@@ -29,7 +29,7 @@ export const DashNav = ({ user, onLogout }: DashNavProps): JSX.Element => {
   const navItems = [
     { label: "Features", active: false },
     { label: "Dashboard", active: true },
-    { label: "Tranning", active: false },
+    { label: "Training", active: false },
     { label: "Safety", active: false },
   ];
 

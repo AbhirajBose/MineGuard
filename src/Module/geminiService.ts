@@ -148,6 +148,97 @@ Focus on identifying if the person is wearing ${equipment.searchTerm}. If you ca
     
     return results;
   }
+
+  async performOcr(imageData: string): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error('Gemini API key not found. Please check your .env file.');
+    }
+
+    const base64Data = imageData.split(',')[1];
+
+    const requestBody = {
+      contents: [{
+        parts: [
+          {
+            text: "This is an image of a document, which may contain handwritten or printed text. Please perform OCR and extract all the text content you can find. Return only the raw text content from the document."
+          },
+          {
+            inline_data: {
+              mime_type: "image/jpeg",
+              data: base64Data
+            }
+          }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 2048,
+      }
+    };
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      return data.candidates[0].content.parts[0].text;
+    } else {
+      throw new Error('Unexpected response format from Gemini API for OCR');
+    }
+  }
+
+  async performTableExtraction(text: string): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error('Gemini API key not found. Please check your .env file.');
+    }
+    const requestBody = {
+      contents: [{
+        parts: [
+          {
+            text: `Convert the following document text into a table. Return only the table in markdown format.\n\n${text}`
+          }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 2048,
+      }
+    };
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      }
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      return data.candidates[0].content.parts[0].text;
+    } else {
+      throw new Error('Unexpected response format from Gemini API for table extraction');
+    }
+  }
 }
 
 export const geminiService = new GeminiService(); 
