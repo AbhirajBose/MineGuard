@@ -46,13 +46,11 @@ export const App = (): JSX.Element => {
     }
   };
 
+  // Get Civic App ID from environment variables
+  const civicAppId = import.meta.env.VITE_CIVIC_APP_ID || "67d7e55d-719e-42b5-859a-ab4dfae9de62";
+
   return (
-    <CivicAuthProvider
-      config={{
-        appId: import.meta.env.VITE_CIVIC_APP_ID || "",
-        authServerUrl: import.meta.env.VITE_CIVIC_AUTH_SERVER_URL || "",
-      }}
-    >
+    <CivicAuthProvider clientId={civicAppId}>
       <div className="w-full h-full bg-[#1e1e1e]">
         {renderView()}
       </div>

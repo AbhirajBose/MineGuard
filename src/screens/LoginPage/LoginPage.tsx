@@ -1,5 +1,5 @@
-import { useLogin, useUser } from "@civic/auth/react";
-import { useEffect } from "react";
+import { useUser } from "@civic/auth/react";
+import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 
 interface LoginPageProps {
@@ -7,15 +7,28 @@ interface LoginPageProps {
 }
 
 export const LoginPage = ({ onLogin }: LoginPageProps): JSX.Element => {
-  const { login, isLoading } = useLogin();
-  const { user } = useUser();
+  const { user, signIn } = useUser();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Get display name with fallbacks
+  const getDisplayName = (civicUser: any) => {
+    if (civicUser.name) return civicUser.name;
+    if (civicUser.given_name && civicUser.family_name) {
+      return `${civicUser.given_name} ${civicUser.family_name}`;
+    }
+    if (civicUser.given_name) return civicUser.given_name;
+    if (civicUser.email) return civicUser.email.split('@')[0];
+    return "User";
+  };
 
   // Check if user is already logged in and redirect to dashboard
   useEffect(() => {
     if (user) {
+      const displayName = getDisplayName(user);
       onLogin({
-        name: user.name || user.email || "User",
-        avatar: user.avatar || "/image-8.png",
+        name: displayName,
+        avatar: user.picture || "/image-8.png",
         email: user.email,
         id: user.id,
       });
@@ -24,9 +37,14 @@ export const LoginPage = ({ onLogin }: LoginPageProps): JSX.Element => {
 
   const handleCivicLogin = async () => {
     try {
-      await login();
+      setError(null);
+      setIsLoading(true);
+      await signIn();
     } catch (error) {
       console.error("Login failed:", error);
+      setError("Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -63,13 +81,11 @@ export const LoginPage = ({ onLogin }: LoginPageProps): JSX.Element => {
             <span className="text-[#ff6b00]">MineGuard</span>
           </h1>
           <p className="text-gray-400 mt-4">
-            If you don't have an account register
+            Secure blockchain-based authentication for mining operations
           </p>
-          <p className="text-white">
-            You can{" "}
-            <a href="#" className="text-[#ff6b00] underline">
-              Register here!
-            </a>
+          <p className="text-white mt-2">
+            Powered by{" "}
+            <span className="text-[#6c47ff] font-semibold">Civic Identity</span>
           </p>
         </div>
       </div>
@@ -79,17 +95,23 @@ export const LoginPage = ({ onLogin }: LoginPageProps): JSX.Element => {
         <div className="w-full max-w-sm">
           <h2 className="text-3xl font-bold mb-8">Sign in</h2>
 
+          {error && (
+            <div className="mb-6 p-3 bg-red-900/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
           <div className="space-y-6">
             <Button
               size="lg"
-              className="w-full h-12 font-medium text-lg rounded-lg flex items-center justify-center gap-3 bg-[#6c47ff] hover:bg-[#5838d1] text-white"
+              className="w-full h-12 font-medium text-lg rounded-lg flex items-center justify-center gap-3 bg-[#6c47ff] hover:bg-[#5838d1] text-white transition-colors"
               onClick={handleCivicLogin}
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Connecting...
+                  Connecting to Civic...
                 </>
               ) : (
                 <>
@@ -137,12 +159,26 @@ export const LoginPage = ({ onLogin }: LoginPageProps): JSX.Element => {
 
           {/* Civic Auth Benefits */}
           <div className="mt-8 p-4 bg-[#2c2c2c] rounded-lg border border-gray-700">
-            <h3 className="text-sm font-semibold text-white mb-2">Secure Identity Verification</h3>
+            <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              Secure Identity Verification
+            </h3>
             <ul className="text-xs text-gray-400 space-y-1">
               <li>• Blockchain-based identity verification</li>
               <li>• Enhanced security for mining operations</li>
               <li>• Decentralized authentication</li>
+              <li>• Zero-knowledge proof technology</li>
             </ul>
+          </div>
+
+          {/* Civic Identity Info */}
+          <div className="mt-4 p-3 bg-[#6c47ff]/10 border border-[#6c47ff]/30 rounded-lg">
+            <div className="flex items-center gap-2 text-xs text-[#6c47ff]">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              Civic Identity provides secure, privacy-preserving authentication
+            </div>
           </div>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import { useUser } from "@civic/auth/react";
+import { Shield, User } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
 
 interface User {
@@ -9,6 +11,8 @@ interface DashboardPageProps {
 }
 
 export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
+  const { user: civicUser } = useUser();
+  
   const statCards = [
     { title: "Current Shift", value: "Morning", subValue: "6:00 - 14:00", icon: "basil-book-solid" },
     { title: "Mine Temperature", value: "25.5°C", subValue: "Normal", icon: "game-icons-mine-truck", status: "normal" },
@@ -22,22 +26,72 @@ export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
     { title: "Schedule Change Notice", description: "Your shift next week has been changed from morning to evening. Please check schedule.", time: "1 hour ago", type: "info" }
   ];
 
-  // Dummy data for attendance chart
-  const attendanceData = Array.from({ length: 9 * 7 * 2 }).map(() => Math.random() > 0.3); // 9 months, 7 days/week, 2 rows (M/F)
+  // Get display name with fallbacks
+  const getDisplayName = () => {
+    if (civicUser) {
+      if (civicUser.name) return civicUser.name;
+      if (civicUser.given_name && civicUser.family_name) {
+        return `${civicUser.given_name} ${civicUser.family_name}`;
+      }
+      if (civicUser.given_name) return civicUser.given_name;
+      if (civicUser.email) return civicUser.email.split('@')[0];
+    }
+    return user.name;
+  };
+
+  const displayName = getDisplayName();
+
+  // Days of the week with unique keys
+  const daysOfWeek = [
+    { key: 'mon', label: 'M' },
+    { key: 'tue', label: 'T' },
+    { key: 'wed', label: 'W' },
+    { key: 'thu', label: 'T' },
+    { key: 'fri', label: 'F' },
+    { key: 'sat', label: 'S' },
+    { key: 'sun', label: 'S' }
+  ];
 
   return (
     <div className="flex-1 p-6 bg-[#1e1e1e] text-white font-['Inter',Helvetica]">
       <div className="max-w-full mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
+        {/* Header with User Info */}
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex-1">
             <h1 className="text-2xl font-bold text-white mb-1">Worker's Dashboard</h1>
-            <p className="text-gray-400">Welcome back, {user.name}. Here's your overview for today.</p>
+            <p className="text-gray-400">Welcome back, {displayName}. Here's your overview for today.</p>
+            
+            {/* Civic User Info */}
+            {civicUser && (
+              <div className="mt-3 flex items-center gap-2 p-3 bg-[#6c47ff]/10 border border-[#6c47ff]/30 rounded-lg max-w-md">
+                <Shield className="w-4 h-4 text-[#6c47ff]" />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-white">Civic Identity Verified</div>
+                  <div className="text-xs text-gray-400">
+                    {civicUser.email && `${civicUser.email} • `}Secure blockchain authentication
+                  </div>
+                  {civicUser.given_name && civicUser.family_name && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {civicUser.given_name} {civicUser.family_name}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-          <Button variant="outline" className="bg-[#2c2c2c] border-gray-600 text-white">
-            Today
-            <img src="/maki-arrow.svg" alt="arrow" className="ml-2 w-3 h-3" />
-          </Button>
+          
+          <div className="flex items-center gap-3">
+            {civicUser && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-500/30 rounded-lg">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-xs text-green-400 font-medium">Verified</span>
+              </div>
+            )}
+            <Button variant="outline" className="bg-[#2c2c2c] border-gray-600 text-white">
+              Today
+              <img src="/maki-arrow.svg" alt="arrow" className="ml-2 w-3 h-3" />
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -75,9 +129,9 @@ export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
                     <div key={month} className="w-10 text-center">{month}</div>
                   ))}
                 </div>
-                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, dayIndex) => (
-                  <div key={day} className="flex items-center gap-2">
-                    <div className="w-8 text-sm text-gray-400">{day}</div>
+                {daysOfWeek.map((day, dayIndex) => (
+                  <div key={day.key} className="flex items-center gap-2">
+                    <div className="w-8 text-sm text-gray-400">{day.label}</div>
                     <div className="grid grid-cols-12 gap-1 flex-1">
                       {Array.from({ length: 12 }).map((_, monthIndex) => {
                         const value = Math.random();
@@ -85,7 +139,7 @@ export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
                         if (value > 0.3) bgColor = 'bg-green-800';
                         if (value > 0.6) bgColor = 'bg-green-600';
                         if (value > 0.8) bgColor = 'bg-green-400';
-                        return <div key={`${dayIndex}-${monthIndex}`} className={`w-full h-6 rounded-sm ${bgColor}`} title={`Attendance: ${value > 0.3 ? 'Present' : 'Absent'}`} />;
+                        return <div key={`${day.key}-${monthIndex}`} className={`w-full h-6 rounded-sm ${bgColor}`} title={`Attendance: ${value > 0.3 ? 'Present' : 'Absent'}`} />;
                       })}
                     </div>
                   </div>
