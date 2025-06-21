@@ -1,3 +1,4 @@
+import { useLogout, useUser } from "@civic/auth/react";
 import { BellIcon, LogOut } from "lucide-react";
 import { useState } from "react";
 import {
@@ -25,6 +26,9 @@ interface DashNavProps {
 
 export const DashNav = ({ user, onLogout }: DashNavProps): JSX.Element => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { logout } = useLogout();
+  const { user: civicUser } = useUser();
+
   // Navigation menu items data
   const navItems = [
     { label: "Features", active: false },
@@ -32,6 +36,23 @@ export const DashNav = ({ user, onLogout }: DashNavProps): JSX.Element => {
     { label: "Training", active: false },
     { label: "Safety", active: false },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      onLogout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Fallback to local logout
+      onLogout();
+    }
+  };
+
+  // Use Civic user data if available, otherwise fallback to prop user
+  const displayUser = civicUser ? {
+    name: civicUser.name || civicUser.email || user.name,
+    avatar: civicUser.avatar || user.avatar
+  } : user;
 
   return (
     <header className="flex w-full items-center justify-between px-20 py-4 bg-[#2c2c2c] border-b-[0.2px] border-white">
@@ -82,18 +103,32 @@ export const DashNav = ({ user, onLogout }: DashNavProps): JSX.Element => {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <Avatar className="w-9 h-9">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={displayUser.avatar} alt={displayUser.name} />
+              <AvatarFallback>{displayUser.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            <span className="font-medium text-white text-xs">{user.name}</span>
+            <span className="font-medium text-white text-xs">{displayUser.name}</span>
+            {civicUser && (
+              <div className="w-2 h-2 bg-green-400 rounded-full" title="Verified with Civic" />
+            )}
           </div>
 
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-[#2c2c2c] border border-gray-700 rounded-md shadow-lg z-20">
+              {civicUser && (
+                <div className="px-4 py-2 border-b border-gray-700">
+                  <div className="flex items-center gap-2 text-xs text-green-400">
+                    <div className="w-2 h-2 bg-green-400 rounded-full" />
+                    Civic Verified
+                  </div>
+                  {civicUser.email && (
+                    <div className="text-xs text-gray-400 mt-1">{civicUser.email}</div>
+                  )}
+                </div>
+              )}
               <Button
                 variant="ghost"
                 className="w-full flex items-center gap-2 px-4 py-2 text-white hover:bg-[#3c3c3c] justify-start"
-                onClick={onLogout}
+                onClick={handleLogout}
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>

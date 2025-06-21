@@ -1,3 +1,4 @@
+import { CivicAuthProvider } from "@civic/auth/react";
 import { useState } from "react";
 import { DashboardAdmins } from "./screens/DashboardAdmins/DashboardAdmins";
 import { LandingPage } from "./screens/LandingPage/LandingPage";
@@ -6,6 +7,8 @@ import { LoginPage } from "./screens/LoginPage";
 type User = {
   name: string;
   avatar: string;
+  email?: string;
+  id?: string;
 };
 
 export const App = (): JSX.Element => {
@@ -44,8 +47,15 @@ export const App = (): JSX.Element => {
   };
 
   return (
-    <div className="w-full h-full bg-[#1e1e1e]">
-      {renderView()}
-    </div>
+    <CivicAuthProvider
+      config={{
+        appId: import.meta.env.VITE_CIVIC_APP_ID || "",
+        authServerUrl: import.meta.env.VITE_CIVIC_AUTH_SERVER_URL || "",
+      }}
+    >
+      <div className="w-full h-full bg-[#1e1e1e]">
+        {renderView()}
+      </div>
+    </CivicAuthProvider>
   );
-}; 
+};
