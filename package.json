@@ -5,10 +5,16 @@
   "name": "MineGuard",
   "description": "A MineGuard Web App, built with React and Tailwind CSS, and use to manage the Mine System",
   "scripts": {
-    "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\"",
+    "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\" \"npm:dev:mongodb\"",
     "dev:frontend": "vite",
     "dev:backend": "npm start --prefix server",
-    "build": "vite build"
+    "dev:mongodb": "mongod --dbpath ./data/db",
+    "dev:setup": "npm run dev:mongodb:setup && npm run dev",
+    "dev:mongodb:setup": "mkdir -p data/db",
+    "setup": "node setup.js",
+    "build": "vite build",
+    "start": "npm run dev:backend",
+    "install:all": "npm install && npm install --prefix server"
   },
   "dependencies": {
     "@civic/auth": "*",

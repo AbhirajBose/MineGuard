@@ -1,7 +1,8 @@
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -11,11 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-const uri = process.env.MONGODB_URI;
-if (!uri) {
-  console.error('Error: MONGODB_URI is not defined. Please check your server/.env file.');
-  process.exit(1);
-}
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/mineguard';
+console.log('Attempting to connect to MongoDB with URI:', uri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')); // Hide credentials in logs
 
 const client = new MongoClient(uri);
 let db;
@@ -23,10 +21,16 @@ let db;
 async function connectDB() {
   try {
     await client.connect();
-    db = client.db("mineguard"); // You can name your database here
-    console.log("Successfully connected to MongoDB Atlas!");
+    db = client.db("mineguard");
+    console.log("✅ Successfully connected to MongoDB!");
+    
+    // Test the connection
+    await db.admin().ping();
+    console.log("✅ MongoDB connection is healthy!");
   } catch (err) {
-    console.error("Failed to connect to MongoDB", err);
+    console.error("❌ Failed to connect to MongoDB:", err.message);
+    console.log("💡 Make sure MongoDB is running and MONGODB_URI is set correctly in your .env file");
+    console.log("💡 For local development, you can start MongoDB with: mongod");
     process.exit(1);
   }
 }
