@@ -1,6 +1,10 @@
 import { Button } from "../../../../components/ui/button";
 
-export const CallToActionSection = (): JSX.Element => {
+interface CallToActionSectionProps {
+  onNavigateToDashboard?: () => void;
+}
+
+export const CallToActionSection = ({ onNavigateToDashboard }: CallToActionSectionProps): JSX.Element => {
   // Data for statistics cards
   const stats = [
     {
@@ -26,6 +30,12 @@ export const CallToActionSection = (): JSX.Element => {
     },
   ];
 
+  const handleGetStartedClick = () => {
+    if (onNavigateToDashboard) {
+      onNavigateToDashboard();
+    }
+  };
+
   return (
     <section className="flex flex-col items-center justify-center py-[125px] w-full bg-cover bg-center [background:url(/Readyframe.png)_50%_50%_/_cover]">
       <div className="flex flex-col items-center justify-center gap-[50px] max-w-4xl mx-auto text-center">
@@ -45,7 +55,10 @@ export const CallToActionSection = (): JSX.Element => {
         </p>
 
         <div className="flex items-center gap-10">
-          <Button className="px-[30px] py-2.5 bg-[#ff6b00] text-black rounded-[10px] hover:bg-[#ff6b00]/90 font-button-large font-[number:var(--button-large-font-weight)] text-[length:var(--button-large-font-size)] tracking-[var(--button-large-letter-spacing)] leading-[var(--button-large-line-height)] [font-style:var(--button-large-font-style)]">
+          <Button 
+            className="px-[30px] py-2.5 bg-[#ff6b00] text-black rounded-[10px] hover:bg-[#ff6b00]/90 font-button-large font-[number:var(--button-large-font-weight)] text-[length:var(--button-large-font-size)] tracking-[var(--button-large-letter-spacing)] leading-[var(--button-large-line-height)] [font-style:var(--button-large-font-style)]"
+            onClick={handleGetStartedClick}
+          >
             Get Started
           </Button>
           <Button

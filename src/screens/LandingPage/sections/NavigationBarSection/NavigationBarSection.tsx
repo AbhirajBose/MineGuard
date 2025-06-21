@@ -1,6 +1,10 @@
 import { Button } from "../../../../components/ui/button";
 
-export const NavigationBarSection = (): JSX.Element => {
+interface NavigationBarSectionProps {
+  onNavigateToDashboard?: () => void;
+}
+
+export const NavigationBarSection = ({ onNavigateToDashboard }: NavigationBarSectionProps): JSX.Element => {
   // Navigation menu items
   const navItems = [
     { label: "Features", href: "#" },
@@ -8,6 +12,25 @@ export const NavigationBarSection = (): JSX.Element => {
     { label: "Tranning", href: "#" }, // Keeping the typo as in original
     { label: "Safety", href: "#" },
   ];
+
+  const handleLoginClick = () => {
+    if (onNavigateToDashboard) {
+      onNavigateToDashboard();
+    }
+  };
+
+  const handleGetStartedClick = () => {
+    if (onNavigateToDashboard) {
+      onNavigateToDashboard();
+    }
+  };
+
+  const handleNavItemClick = (e: React.MouseEvent, item: { label: string; href: string }) => {
+    e.preventDefault();
+    if (onNavigateToDashboard) {
+      onNavigateToDashboard();
+    }
+  };
 
   return (
     <nav className="flex items-center justify-between px-20 py-4 relative self-stretch w-full flex-[0_0_auto] bg-[#2c2c2c] border-b-[0.2px] [border-bottom-style:solid] border-white">
@@ -39,7 +62,8 @@ export const NavigationBarSection = (): JSX.Element => {
           <a
             key={index}
             href={item.href}
-            className="relative w-fit mt-[-1.00px] [font-family:'Inter',Helvetica] font-medium text-white text-base tracking-[0] leading-[normal] whitespace-nowrap hover:text-[#ff6b00] transition-colors"
+            className="relative w-fit mt-[-1.00px] [font-family:'Inter',Helvetica] font-medium text-white text-base tracking-[0] leading-[normal] whitespace-nowrap hover:text-[#ff6b00] transition-colors cursor-pointer"
+            onClick={(e) => handleNavItemClick(e, item)}
           >
             {item.label}
           </a>
@@ -51,11 +75,15 @@ export const NavigationBarSection = (): JSX.Element => {
         <Button
           variant="ghost"
           className="h-auto px-4 py-1.5 bg-[#ffffff57] rounded text-white hover:bg-[#ffffff70] [font-family:'Inter',Helvetica] font-semibold text-xs"
+          onClick={handleLoginClick}
         >
           Login
         </Button>
 
-        <Button className="h-auto px-4 py-1.5 bg-[#ff6b00] hover:bg-[#ff6b00]/90 rounded text-white [font-family:'Inter',Helvetica] font-semibold text-xs">
+        <Button 
+          className="h-auto px-4 py-1.5 bg-[#ff6b00] hover:bg-[#ff6b00]/90 rounded text-white [font-family:'Inter',Helvetica] font-semibold text-xs"
+          onClick={handleGetStartedClick}
+        >
           Get Started
         </Button>
       </div>
