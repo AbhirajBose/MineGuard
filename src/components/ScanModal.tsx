@@ -1,4 +1,4 @@
-import { AlertCircleIcon, CameraIcon, CheckIcon, UploadIcon, XIcon } from 'lucide-react';
+import { AlertCircleIcon, CameraIcon, CheckIcon, UploadIcon, UserIcon, XIcon } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { cameraService } from '../Module/cameraService';
 import { geminiService, REQUIRED_EQUIPMENT } from '../Module/geminiService';
@@ -70,7 +70,7 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onScanCom
     canvas.height = videoRef.current.videoHeight;
     ctx.drawImage(videoRef.current, 0, 0);
 
-    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    const imageData = canvas.toDataURL('image/jpeg', 0.9);
     setCurrentImage(imageData);
     setIsScanning(false);
   };
@@ -136,10 +136,10 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onScanCom
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-4xl bg-[#2c2c2c] border-none text-white">
+      <Card className="w-full max-w-6xl bg-[#2c2c2c] border-none text-white">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-xl font-semibold">
-            Equipment Safety Scan
+            Full Body Equipment Safety Scan
           </CardTitle>
           <Button
             variant="ghost"
@@ -163,28 +163,56 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onScanCom
               <div className="relative bg-[#393939] rounded-lg overflow-hidden">
                 <video
                   ref={videoRef}
-                  className="w-full h-64 object-cover"
+                  className="w-full h-96 object-cover"
                   autoPlay
                   muted
                   playsInline
                 />
                 <canvas ref={canvasRef} className="hidden" />
                 
+                {/* Full Body Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="border-2 border-[#ff6b00] border-dashed rounded-lg p-8 m-4">
+                    <div className="flex flex-col items-center text-center">
+                      <UserIcon className="w-16 h-16 text-[#ff6b00] mb-2" />
+                      <p className="text-white font-medium text-lg">Position yourself here</p>
+                      <p className="text-gray-300 text-sm mt-1">Ensure your full body is visible</p>
+                    </div>
+                  </div>
+                </div>
+                
                 {isScanning && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff6b00] mx-auto mb-2"></div>
-                      <p className="text-white font-medium">Recording...</p>
+                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#ff6b00] mx-auto mb-4"></div>
+                      <p className="text-white font-medium text-lg">Recording...</p>
+                      <p className="text-gray-300 text-sm mt-1">Stay still for best results</p>
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Equipment Guide */}
+              <div className="bg-[#393939] rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-3">Equipment to Verify:</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                  {REQUIRED_EQUIPMENT.map((equipment, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-[#ff6b00] rounded-full"></div>
+                      <span className="text-gray-300">{equipment.name}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-gray-400 text-xs mt-2">
+                  * System will detect everyday items as safety equipment equivalents
+                </p>
               </div>
 
               <div className="flex gap-4">
                 <Button
                   onClick={() => setIsScanning(true)}
                   disabled={isScanning}
-                  className="flex-1 bg-[#ff6b00] hover:bg-[#e66000]"
+                  className="flex-1 bg-[#ff6b00] hover:bg-[#e66000] h-12"
                 >
                   <CameraIcon className="w-5 h-5 mr-2" />
                   {isScanning ? 'Recording...' : 'Start Recording'}
@@ -193,9 +221,9 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onScanCom
                 <Button
                   onClick={captureImage}
                   disabled={!isScanning}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="flex-1 bg-green-600 hover:bg-green-700 h-12"
                 >
-                  Capture Photo
+                  Capture Full Body Photo
                 </Button>
 
                 <div className="relative">
@@ -207,7 +235,7 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onScanCom
                   />
                   <Button
                     variant="outline"
-                    className="flex-1 bg-[#393939] hover:bg-[#444444] border-gray-600"
+                    className="flex-1 bg-[#393939] hover:bg-[#444444] border-gray-600 h-12"
                   >
                     <UploadIcon className="w-5 h-5 mr-2" />
                     Upload Photo
@@ -223,7 +251,7 @@ export const ScanModal: React.FC<ScanModalProps> = ({ isOpen, onClose, onScanCom
                 <img
                   src={currentImage}
                   alt="Captured"
-                  className="w-full h-64 object-cover rounded-lg"
+                  className="w-full h-96 object-cover rounded-lg"
                 />
               </div>
               

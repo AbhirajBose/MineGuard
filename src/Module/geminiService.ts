@@ -13,16 +13,17 @@ export interface EquipmentItem {
   name: string;
   required: boolean;
   description: string;
+  searchTerm: string; // What to actually search for in the image
 }
 
 export const REQUIRED_EQUIPMENT: EquipmentItem[] = [
-  { name: "Safety Helmet", required: true, description: "Hard hat or safety helmet" },
-  { name: "Safety Jacket", required: true, description: "High visibility safety jacket or vest" },
-  { name: "Safety Goggles", required: true, description: "Eye protection goggles" },
-  { name: "Ear Protection", required: true, description: "Earplugs or earmuffs" },
-  { name: "Respirator", required: true, description: "Respiratory protection mask" },
-  { name: "Safety Gloves", required: true, description: "Work gloves for hand protection" },
-  { name: "Safety Boots", required: true, description: "Steel toe or safety boots" },
+  { name: "Safety Helmet", required: true, description: "Hard hat or safety helmet", searchTerm: "cap or hat on head" },
+  { name: "Safety Jacket", required: true, description: "High visibility safety jacket or vest", searchTerm: "shirt or jacket on body" },
+  { name: "Safety Goggles", required: true, description: "Eye protection goggles", searchTerm: "glasses or sunglasses on face" },
+  { name: "Ear Protection", required: true, description: "Earplugs or earmuffs", searchTerm: "earbuds or headphones on ears" },
+  { name: "Respirator", required: true, description: "Respiratory protection mask", searchTerm: "mask covering mouth or nose" },
+  { name: "Safety Gloves", required: true, description: "Work gloves for hand protection", searchTerm: "gloves on hands" },
+  { name: "Safety Boots", required: true, description: "Steel toe or safety boots", searchTerm: "shoes or boots on feet" },
 ];
 
 class GeminiService {
@@ -32,7 +33,7 @@ class GeminiService {
     this.apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
   }
 
-  private async makeApiRequest(imageData: string, equipmentName: string): Promise<any> {
+  private async makeApiRequest(imageData: string, equipment: EquipmentItem): Promise<any> {
     if (!this.apiKey) {
       throw new Error('Gemini API key not found. Please check your .env file.');
     }
@@ -43,16 +44,17 @@ class GeminiService {
       contents: [{
         parts: [
           {
-            text: `Analyze this image carefully. Is there a person wearing or carrying ${equipmentName.toLowerCase()} in this image? 
-            
-            Equipment to check: ${equipmentName}
-            
-            Please respond in this exact format:
-            PRESENT: YES/NO
-            CONFIDENCE: 0-100
-            EXPLANATION: Brief description of what you see
-            
-            Focus on identifying if the safety equipment is visible and properly worn.`
+            text: `Analyze this image carefully. Look for a full body view of a person and check if they are wearing ${equipment.searchTerm}.
+
+Equipment to verify: ${equipment.name}
+What to look for: ${equipment.searchTerm}
+
+Please respond in this exact format:
+PRESENT: YES/NO
+CONFIDENCE: 0-100
+EXPLANATION: Brief description of what you see
+
+Focus on identifying if the person is wearing ${equipment.searchTerm}. If you cannot see the full body or the relevant body part, respond with NO.`
           },
           {
             inline_data: {
@@ -87,9 +89,9 @@ class GeminiService {
     return await response.json();
   }
 
-  async analyzeEquipment(imageData: string, equipmentName: string): Promise<ScanResult> {
+  async analyzeEquipment(imageData: string, equipment: EquipmentItem): Promise<ScanResult> {
     try {
-      const data = await this.makeApiRequest(imageData, equipmentName);
+      const data = await this.makeApiRequest(imageData, equipment);
       
       if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
         throw new Error('Unexpected response format from Gemini API');
@@ -109,7 +111,7 @@ class GeminiService {
       return {
         id: `scan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date(),
-        equipmentName,
+        equipmentName: equipment.name,
         isPresent,
         confidence,
         imageData,
@@ -126,7 +128,7 @@ class GeminiService {
     
     for (const equipment of REQUIRED_EQUIPMENT) {
       try {
-        const result = await this.analyzeEquipment(imageData, equipment.name);
+        const result = await this.analyzeEquipment(imageData, equipment);
         results.push(result);
         // Add a small delay between requests to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 500));

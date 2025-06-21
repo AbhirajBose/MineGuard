@@ -38,27 +38,33 @@ npm run dev
 1. Navigate to the "Equipment Verification" section in the dashboard
 2. Click "Start Scan" or "Scan Again"
 3. Allow camera access when prompted
-4. Take a photo or upload an image
-5. Click "Analyze Equipment"
+4. Position yourself in the full body overlay
+5. Take a photo or upload an image
+6. Click "Analyze Equipment"
 
-The system will now use Gemini AI to analyze the image and detect safety equipment.
+The system will now use Gemini AI to analyze the image and detect safety equipment equivalents.
 
 ## Features
 
-### Live Camera Integration
+### Full Body Camera Integration
+- High-resolution video capture (1920x1080)
+- Full body positioning overlay
 - Real-time video capture
 - Photo capture functionality
 - File upload support
 
-### AI-Powered Analysis
-- Detects 7 types of safety equipment:
-  - Safety Helmet
-  - Safety Jacket
-  - Safety Goggles
-  - Ear Protection
-  - Respirator
-  - Safety Gloves
-  - Safety Boots
+### AI-Powered Equipment Detection
+The system detects everyday items as safety equipment equivalents:
+
+| Safety Equipment | Detects As |
+|------------------|------------|
+| Safety Helmet | Cap or hat on head |
+| Safety Jacket | Shirt or jacket on body |
+| Safety Goggles | Glasses or sunglasses on face |
+| Ear Protection | Earbuds or headphones on ears |
+| Respirator | Mask covering mouth or nose |
+| Safety Gloves | Gloves on hands |
+| Safety Boots | Shoes or boots on feet |
 
 ### Local Database
 - Stores scan results locally using localStorage
@@ -69,6 +75,15 @@ The system will now use Gemini AI to analyze the image and detect safety equipme
 - Live progress indicators
 - Confidence scores for each equipment type
 - Pass/fail status for overall scan
+- Full body positioning guidance
+
+## How It Works
+
+1. **Positioning**: Users position themselves in the full body overlay
+2. **Capture**: High-quality photo is captured showing the full body
+3. **Analysis**: Gemini AI analyzes the image for everyday items
+4. **Mapping**: Everyday items are mapped to safety equipment
+5. **Results**: System displays results as safety equipment verification
 
 ## Troubleshooting
 
@@ -81,11 +96,19 @@ The system will now use Gemini AI to analyze the image and detect safety equipme
 - Ensure your browser supports camera access
 - Check that you've granted camera permissions
 - Try refreshing the page and allowing camera access again
+- Position yourself to fit in the full body overlay
 
 ### Analysis Failures
 - Check your internet connection
 - Verify your Gemini API quota hasn't been exceeded
-- Ensure the image is clear and well-lit
+- Ensure the image shows your full body clearly
+- Make sure you're wearing everyday items (cap, shirt, glasses, etc.)
+
+### Full Body Capture Issues
+- Stand back from the camera to fit in the overlay
+- Ensure good lighting
+- Remove any obstructions
+- Position yourself in the center of the frame
 
 ## Security Notes
 
@@ -97,9 +120,23 @@ The system will now use Gemini AI to analyze the image and detect safety equipme
 
 The integration uses the Gemini 1.5 Flash model for image analysis. Each scan analyzes 7 equipment types, so expect 7 API calls per scan.
 
+## Testing Tips
+
+For best results during testing:
+1. Wear a cap or hat
+2. Wear a shirt or jacket
+3. Wear glasses or sunglasses
+4. Use earbuds or headphones
+5. Wear a mask (if available)
+6. Wear gloves
+7. Wear shoes or boots
+
+This will ensure all equipment types are detected as present.
+
 ## Support
 
 If you encounter issues:
 1. Check the browser console for error messages
 2. Verify your API key is working in Google AI Studio
-3. Ensure all environment variables are properly set 
+3. Ensure all environment variables are properly set
+4. Make sure you're positioned correctly in the full body overlay 

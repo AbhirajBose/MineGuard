@@ -11,8 +11,10 @@ export class CameraService {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: { ideal: 1920, min: 1280 },
+          height: { ideal: 1080, min: 720 },
+          aspectRatio: { ideal: 16/9 },
+          frameRate: { ideal: 30 }
         }
       });
 
@@ -41,7 +43,7 @@ export class CameraService {
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0);
     
-    return canvas.toDataURL('image/jpeg', 0.8);
+    return canvas.toDataURL('image/jpeg', 0.9);
   }
 
   stopCamera(): void {
