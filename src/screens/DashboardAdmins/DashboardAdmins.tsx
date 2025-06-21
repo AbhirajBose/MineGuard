@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ScanSession } from "../../Module/scanDatabase";
 import { DashboardPage } from "./sections/DashboardPage";
 import { DashNav } from "./sections/DashNav";
 import { EquipmentCheckSection } from "./sections/EquipmentCheckSection";
@@ -29,6 +30,11 @@ export const DashboardAdmins = ({ user, onLogout, onNavigateToLanding }: Dashboa
     setCurrentPage(menuItem);
   };
 
+  const handleScanComplete = (session: ScanSession) => {
+    // You can add additional logic here like notifications, analytics, etc.
+    console.log('Scan completed:', session);
+  };
+
   const renderCurrentPage = () => {
     switch (currentPage) {
       case "Dashboard":
@@ -44,7 +50,7 @@ export const DashboardAdmins = ({ user, onLogout, onNavigateToLanding }: Dashboa
       case "Equipment Verification":
         return (
           <>
-            <EquipmentCheckSection />
+            <EquipmentCheckSection onScanComplete={handleScanComplete} />
             <ScanActionsSection />
           </>
         );

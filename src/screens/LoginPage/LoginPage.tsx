@@ -56,7 +56,9 @@ export const LoginPage = ({ onLogin }: LoginPageProps): JSX.Element => {
           
           <div className="space-y-6">
             <Button 
-              className="w-full h-12 bg-white hover:bg-gray-100 text-black font-medium text-lg rounded-lg flex items-center justify-center gap-3"
+              variant="google"
+              size="lg"
+              className="w-full h-12 font-medium text-lg rounded-lg flex items-center justify-center gap-3"
               onClick={handleGoogleLogin}
             >
               <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="w-6 h-6" />
