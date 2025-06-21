@@ -1,4 +1,5 @@
-import { BellIcon } from "lucide-react";
+import { BellIcon, LogOut } from "lucide-react";
+import { useState } from "react";
 import {
   Avatar,
   AvatarFallback,
@@ -12,11 +13,18 @@ import {
   NavigationMenuList,
 } from "../../../../components/ui/navigation-menu";
 
-interface DashNavProps {
-  onNavigateToLanding?: () => void;
+interface User {
+  name: string;
+  avatar: string;
 }
 
-export const DashNav = ({ onNavigateToLanding }: DashNavProps): JSX.Element => {
+interface DashNavProps {
+  user: User;
+  onLogout: () => void;
+}
+
+export const DashNav = ({ user, onLogout }: DashNavProps): JSX.Element => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   // Navigation menu items data
   const navItems = [
     { label: "Features", active: false },
@@ -24,12 +32,6 @@ export const DashNav = ({ onNavigateToLanding }: DashNavProps): JSX.Element => {
     { label: "Tranning", active: false },
     { label: "Safety", active: false },
   ];
-
-  const handleLogout = () => {
-    if (onNavigateToLanding) {
-      onNavigateToLanding();
-    }
-  };
 
   return (
     <header className="flex w-full items-center justify-between px-20 py-4 bg-[#2c2c2c] border-b-[0.2px] border-white">
@@ -74,21 +76,31 @@ export const DashNav = ({ onNavigateToLanding }: DashNavProps): JSX.Element => {
       <div className="flex items-center justify-center gap-6">
         <BellIcon className="w-6 h-6 text-white" />
 
-        <div className="flex items-center justify-center gap-2">
-          <Avatar className="w-9 h-9">
-            <AvatarImage src="/frame-16.svg" alt="User avatar" />
-            <AvatarFallback>CH</AvatarFallback>
-          </Avatar>
-          <span className="font-medium text-white text-xs">Charle</span>
-        </div>
+        <div className="relative">
+          <div 
+            className="flex items-center justify-center gap-2 cursor-pointer"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            <Avatar className="w-9 h-9">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <span className="font-medium text-white text-xs">{user.name}</span>
+          </div>
 
-        <Button
-          variant="ghost"
-          className="h-auto px-4 py-1.5 bg-[#ffffff57] rounded text-white hover:bg-[#ffffff70] font-semibold text-xs"
-          onClick={handleLogout}
-        >
-          Logout
-        </Button>
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-[#2c2c2c] border border-gray-700 rounded-md shadow-lg z-20">
+              <Button
+                variant="ghost"
+                className="w-full flex items-center gap-2 px-4 py-2 text-white hover:bg-[#3c3c3c] justify-start"
+                onClick={onLogout}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

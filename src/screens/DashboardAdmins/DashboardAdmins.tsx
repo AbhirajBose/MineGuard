@@ -11,11 +11,18 @@ import { SchedulePage } from "./sections/SchedulePage";
 import { VRTrainingPage } from "./sections/VRTrainingPage";
 import { Web3TrackingPage } from "./sections/Web3TrackingPage";
 
+interface User {
+  name: string;
+  avatar: string;
+}
+
 interface DashboardAdminsProps {
+  user: User;
+  onLogout: () => void;
   onNavigateToLanding?: () => void;
 }
 
-export const DashboardAdmins = ({ onNavigateToLanding }: DashboardAdminsProps): JSX.Element => {
+export const DashboardAdmins = ({ user, onLogout, onNavigateToLanding }: DashboardAdminsProps): JSX.Element => {
   const [currentPage, setCurrentPage] = useState("Dashboard");
 
   const handleMenuClick = (menuItem: string) => {
@@ -25,7 +32,7 @@ export const DashboardAdmins = ({ onNavigateToLanding }: DashboardAdminsProps): 
   const renderCurrentPage = () => {
     switch (currentPage) {
       case "Dashboard":
-        return <DashboardPage />;
+        return <DashboardPage user={user} />;
       case "Shift & Schedule":
         return <SchedulePage />;
       case "LogBook":
@@ -46,18 +53,13 @@ export const DashboardAdmins = ({ onNavigateToLanding }: DashboardAdminsProps): 
       case "OCR Logs":
         return <OCRLogsPage />;
       default:
-        return (
-          <>
-            <EquipmentCheckSection />
-            <ScanActionsSection />
-          </>
-        );
+        return <DashboardPage user={user} />;
     }
   };
 
   return (
     <div className="bg-[#1e1e1e] flex flex-col w-full min-h-screen">
-      <DashNav onNavigateToLanding={onNavigateToLanding} />
+      <DashNav user={user} onLogout={onLogout} />
       <div className="flex flex-1">
         <aside className="h-full">
           <MainMenuSection onMenuItemClick={handleMenuClick} selectedItem={currentPage} />

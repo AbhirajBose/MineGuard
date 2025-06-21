@@ -1,6 +1,14 @@
 import { Button } from "../../../../components/ui/button";
 
-export const DashboardPage = (): JSX.Element => {
+interface User {
+  name: string;
+}
+
+interface DashboardPageProps {
+  user: User;
+}
+
+export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
   const statCards = [
     { title: "Current Shift", value: "Morning", subValue: "6:00 - 14:00", icon: "basil-book-solid" },
     { title: "Mine Temperature", value: "25.5°C", subValue: "Normal", icon: "game-icons-mine-truck", status: "normal" },
@@ -24,7 +32,7 @@ export const DashboardPage = (): JSX.Element => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white mb-1">Worker's Dashboard</h1>
-            <p className="text-gray-400">Welcome back, James. Here's your overview for today.</p>
+            <p className="text-gray-400">Welcome back, {user.name}. Here's your overview for today.</p>
           </div>
           <Button variant="outline" className="bg-[#2c2c2c] border-gray-600 text-white">
             Today
