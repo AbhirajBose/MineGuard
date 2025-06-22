@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import QRCode from 'qrcode';
+import html2canvas from 'html2canvas';
 
 // Extend jsPDF with the autoTable plugin
 interface jsPDFWithAutoTable extends jsPDF {
@@ -131,6 +132,98 @@ class QRService {
     doc.save(`Batch-Report-${batchData.id}.pdf`);
   }
 
+  async generateProductionReport(
+    stats: any, 
+    recentBatches: CoalBatchData[],
+    charts: { volumeChart: HTMLElement | null, qualityChart: HTMLElement | null, locationChart: HTMLElement | null }
+  ): Promise<void> {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const margin = 15;
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Header
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('MineGuard - Production Statistics Report', pageWidth / 2, 20, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, 28, { align: 'center' });
+    
+    let yPos = 40;
+
+    // Key Stats
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Key Performance Indicators', margin, yPos);
+    yPos += 8;
+
+    autoTable(doc, {
+        startY: yPos,
+        body: [
+            ['Total Production', `${stats.totalWeight.toLocaleString()} tons`],
+            ['Total Batches', stats.totalBatches.toLocaleString()],
+            ['Average Batch Weight', `${stats.averageWeight.toFixed(2)} tons`],
+            ['Premium Quality Rate', `${(stats.qualityDistribution['Premium'] || 0) / stats.totalBatches * 100 > 0 ? ((stats.qualityDistribution['Premium'] || 0) / stats.totalBatches * 100).toFixed(1) : 0}%`],
+        ],
+        theme: 'plain',
+        styles: { fontSize: 11 },
+    });
+
+    yPos = (doc as any).lastAutoTable.finalY + 15;
+
+    // Charts
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Data Visualizations', margin, yPos);
+    yPos += 8;
+
+    if (charts.volumeChart) {
+        const canvas = await html2canvas(charts.volumeChart, { backgroundColor: '#2c2c2c' });
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', margin, yPos, 180, 80);
+        yPos += 90;
+    }
+
+    if (charts.qualityChart) {
+        const canvas = await html2canvas(charts.qualityChart, { backgroundColor: '#2c2c2c' });
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', margin, yPos, 85, 80);
+    }
+    
+    if (charts.locationChart) {
+        const canvas = await html2canvas(charts.locationChart, { backgroundColor: '#2c2c2c' });
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', margin + 95, yPos, 85, 80);
+    }
+    yPos += 90;
+
+    // Recent Batches Table
+    doc.addPage();
+    yPos = 20;
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Recent Production Batches', margin, yPos);
+    yPos += 8;
+
+    autoTable(doc, {
+        startY: yPos,
+        head: [['Batch ID', 'Weight (tons)', 'Quality', 'Location', 'Dispatch Time']],
+        body: recentBatches.map(b => [b.id, b.weight.toLocaleString(), b.quality, b.mineLocation, b.dispatchTime.toLocaleString()]),
+        theme: 'grid',
+        headStyles: { fillColor: [255, 107, 0] },
+    });
+
+
+    // Footer
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for(let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, 287, { align: 'center' });
+    }
+
+    doc.save(`Production-Report-${new Date().toISOString().split('T')[0]}.pdf`);
+  }
 
   async validateBatchData(data: QRGenerationRequest): Promise<{ isValid: boolean; errors: string[] }> {
     const errors: string[] = [];
