@@ -1,5 +1,5 @@
 import { useUser } from "@civic/auth/react";
-import { BellIcon, LogOut, User, Shield, Settings, Menu } from "lucide-react";
+import { BellIcon, LogOut, User as UserIcon, Shield, Settings, Menu } from "lucide-react";
 import { useState } from "react";
 import {
   Avatar,
@@ -8,10 +8,16 @@ import {
 } from "../../../../components/ui/avatar";
 import { Button } from "../../../../components/ui/button";
 
-interface User {
-  name: string;
-  avatar: string;
-}
+// Use a more flexible User type consistent with App.tsx
+type User = {
+  name?: string;
+  avatar?: string;
+  email?: string;
+  id?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+};
 
 interface DashNavProps {
   user: User;
@@ -149,7 +155,7 @@ export const DashNav = ({ user, onLogout }: DashNavProps): JSX.Element => {
                   variant="ghost"
                   className="w-full flex items-center gap-3 px-4 py-2 text-white hover:bg-[#3c3c3c] justify-start transition-colors duration-200"
                 >
-                  <User className="w-4 h-4 flex-shrink-0" />
+                  <UserIcon className="w-4 h-4 flex-shrink-0" />
                   <span>Profile</span>
                 </Button>
                 

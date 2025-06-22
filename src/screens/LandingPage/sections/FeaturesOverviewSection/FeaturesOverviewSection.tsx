@@ -42,11 +42,11 @@ export const FeaturesOverviewSection = (): JSX.Element => {
       alt: "Group",
     },
     {
-      title: "Aptos Batch Tracking",
+      title: "QR Batch Tracking",
       description:
-        "Web3-powered supply chain visibility with immutable records of coal batches from extraction to delivery.",
+        "QR code-powered supply chain visibility with detailed reports of coal batches from extraction to delivery.",
       icon: "/mingcute-link-fill.svg",
-      alt: "Group",
+      alt: "QR tracking",
     },
   ];
 

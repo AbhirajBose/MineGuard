@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScanSession } from "../../Module/scanDatabase";
+import { ScanSession } from "../../Module/geminiService";
 import { DashboardPage } from "./sections/DashboardPage";
 import { DashNav } from "./sections/DashNav";
 import { EquipmentCheckSection } from "./sections/EquipmentCheckSection";
@@ -10,17 +10,24 @@ import { ProductionPage } from "./sections/ProductionPage";
 import { ScanActionsSection } from "./sections/ScanActionsSection";
 import { SchedulePage } from "./sections/SchedulePage";
 import { VRTrainingPage } from "./sections/VRTrainingPage";
-import { Web3TrackingPage } from "./sections/Web3TrackingPage";
+import { QRTrackingPage } from "./sections/QRTrackingPage";
+import { MainMenu } from "../../components/MainMenu";
 
-interface User {
-  name: string;
-  avatar: string;
-}
+// Use a more flexible User type consistent with App.tsx
+type User = {
+  name?: string;
+  avatar?: string;
+  email?: string;
+  id?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+};
 
 interface DashboardAdminsProps {
   user: User;
   onLogout: () => void;
-  onNavigateToLanding?: () => void;
+  onNavigateToLanding: () => void;
 }
 
 export const DashboardAdmins = ({ user, onLogout, onNavigateToLanding }: DashboardAdminsProps): JSX.Element => {
@@ -54,8 +61,8 @@ export const DashboardAdmins = ({ user, onLogout, onNavigateToLanding }: Dashboa
             <ScanActionsSection />
           </>
         );
-      case "Web3 Tracking":
-        return <Web3TrackingPage />;
+      case "QR Tracking":
+        return <QRTrackingPage />;
       case "OCR Logs":
         return <OCRLogsPage />;
       default:

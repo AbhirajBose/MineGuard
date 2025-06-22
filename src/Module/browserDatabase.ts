@@ -3,7 +3,7 @@ import { config } from '../config/environment';
 
 export class BrowserDatabase {
   private dbName = config.database.name;
-  private version = config.database.version;
+  private version = 2; // Incremented version to trigger upgrade
   private db: IDBDatabase | null = null;
 
   async connect(): Promise<void> {
@@ -45,7 +45,15 @@ export class BrowserDatabase {
           ocrStore.createIndex('filename', 'filename', { unique: false });
         }
 
-        console.log('IndexedDB schema created successfully');
+        if (!db.objectStoreNames.contains('coal_batches')) {
+          const batchesStore = db.createObjectStore('coal_batches', { keyPath: 'id' });
+          batchesStore.createIndex('dispatchTime', 'dispatchTime', { unique: false });
+          batchesStore.createIndex('quality', 'quality', { unique: false });
+          batchesStore.createIndex('mineLocation', 'mineLocation', { unique: false });
+          batchesStore.createIndex('createdAt', 'createdAt', { unique: false });
+        }
+
+        console.log('IndexedDB schema upgraded successfully');
       };
     });
   }

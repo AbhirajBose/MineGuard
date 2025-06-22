@@ -32,7 +32,7 @@ export class DatabaseInitializer {
       }
 
       // For IndexedDB, we'll return the collections we know about
-      const collections = ['scans', 'logbook_entries', 'ocr_scans'];
+      const collections = ['scans', 'logbook_entries', 'ocr_scans', 'coal_batches'];
 
       const totalDocuments: Record<string, number> = {};
       for (const collectionName of collections) {

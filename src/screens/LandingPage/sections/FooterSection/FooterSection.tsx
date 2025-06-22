@@ -55,7 +55,7 @@ export const FooterSection = (): JSX.Element => {
           {/* Description and CTA */}
           <div className="inline-flex flex-col items-start gap-4 relative flex-[0_0_auto]">
             <p className="relative w-[420px] mt-[-1.00px] [font-family:'Inter',Helvetica] font-medium text-white text-base tracking-[0] leading-[normal]">
-              Comprehensive management platform integrating Al, Web3, and IOT
+              Comprehensive management platform integrating Al, QR tracking, and IOT
               for safer, more efficient mining operations.
             </p>
 

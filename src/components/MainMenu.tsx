@@ -51,8 +51,8 @@ export const MainMenu = ({ className, onMenuItemClick, selectedItem = "Dashboard
       label: "Equipment Verification",
     },
     {
-      icon: <Icon name="web3" className="w-5 h-5" />,
-      label: "Web3 Tracking",
+      icon: <Icon name="mingcute-link-fill" className="w-5 h-5" />,
+      label: "QR Tracking",
     },
     {
       icon: <Icon name="ocrlog" className="w-5 h-5" />,

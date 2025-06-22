@@ -5,10 +5,10 @@ import { Card } from "../../../../components/ui/card";
 export const BlockchainIntegrationSection = (): JSX.Element => {
   const features = [
     {
-      icon: "/token-branded-aptos.svg",
-      title: "Aptos Blockchain Integration",
+      icon: "/mingcute-link-fill.svg",
+      title: "QR Batch Tracking System",
       description:
-        "Immutable tracking of coal batches from extraction to delivery with Web3 verification for supply chain transparency.",
+        "Advanced QR code generation for coal batches with detailed PDF reports containing weight, quality, location, and dispatch timestamps.",
     },
     {
       icon: "/mdi-file-edit.svg",
@@ -23,25 +23,25 @@ export const BlockchainIntegrationSection = (): JSX.Element => {
       <Card className="flex flex-col w-full md:w-[540px] items-start gap-2.5 rounded-[20px] overflow-hidden border-[20px] border-solid border-[#131313] bg-transparent">
         <img
           className="h-[478.49px] w-full object-cover"
-          alt="Blockchain technology interface"
+          alt="QR tracking technology interface"
           src="/image-8.png"
         />
       </Card>
 
-      <div className="flex flex-col w-full md:w-[570px] items-start gap-[22px] mt-8 md:mt-0">
+      <div className="flex flex-col items-start gap-6 w-full md:w-[527px]">
         <Badge className="px-6 py-1.5 bg-[#0066ff24] text-[#0066ff] rounded-[20px] border border-solid border-[#0066ff] shadow-[0px_4px_4px_#00000040] font-medium text-base">
-          Advance Web3
+          Advanced QR Tracking
         </Badge>
 
         <div className="flex flex-col gap-10 w-full">
           <div className="flex flex-col items-start gap-6 w-full">
             <h2 className="text-[32px] font-bold text-white font-['Inter',Helvetica] leading-normal">
-              Blockchain Integration
+              QR Batch Tracking
             </h2>
 
             <p className="text-xl font-medium text-[#ffffffb2] font-['Inter',Helvetica] leading-normal">
-              Blockchain technology to optimize operations and ensure
-              transparent supply chain management.
+              QR code technology to optimize operations and ensure
+              transparent supply chain management for coal batches.
             </p>
           </div>
 

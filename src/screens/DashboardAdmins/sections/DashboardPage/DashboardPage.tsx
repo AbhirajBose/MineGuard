@@ -1,10 +1,19 @@
 import { useUser } from "@civic/auth/react";
 import { Shield, User } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
+import { Card, CardContent } from "../../../../components/ui/card";
+import { Separator } from "../../../../components/ui/separator";
 
-interface User {
-  name: string;
-}
+// Use a more flexible User type consistent with App.tsx
+type User = {
+  name?: string;
+  avatar?: string;
+  email?: string;
+  id?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+};
 
 interface DashboardPageProps {
   user: User;
@@ -26,20 +35,14 @@ export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
     { title: "Schedule Change Notice", description: "Your shift next week has been changed from morning to evening. Please check schedule.", time: "1 hour ago", type: "info" }
   ];
 
-  // Get display name with fallbacks
-  const getDisplayName = () => {
-    if (civicUser) {
-      if (civicUser.name) return civicUser.name;
-      if (civicUser.given_name && civicUser.family_name) {
-        return `${civicUser.given_name} ${civicUser.family_name}`;
-      }
-      if (civicUser.given_name) return civicUser.given_name;
-      if (civicUser.email) return civicUser.email.split('@')[0];
-    }
-    return user.name;
+  const getGreeting = () => {
+    const hours = new Date().getHours();
+    if (hours < 12) return "Good Morning";
+    if (hours < 18) return "Good Afternoon";
+    return "Good Evening";
   };
 
-  const displayName = getDisplayName();
+  const displayName = user?.given_name || user?.name || "Admin";
 
   // Days of the week with unique keys
   const daysOfWeek = [
@@ -58,8 +61,8 @@ export const DashboardPage = ({ user }: DashboardPageProps): JSX.Element => {
         {/* Header with User Info */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-white mb-1">Worker's Dashboard</h1>
-            <p className="text-gray-400">Welcome back, {displayName}. Here's your overview for today.</p>
+            <h1 className="text-2xl font-bold text-white mb-1">{getGreeting()}, {displayName}!</h1>
+            <p className="text-gray-400">Here's your overview for today.</p>
             
             {/* Civic User Info */}
             {civicUser && (

@@ -7,7 +7,8 @@ export const config = {
     collections: {
       scans: 'scans',
       logbookEntries: 'logbook_entries',
-      ocrScans: 'ocr_scans'
+      ocrScans: 'ocr_scans',
+      coalBatches: 'coal_batches'
     }
   },
 
@@ -21,6 +22,15 @@ export const config = {
   // Gemini AI
   gemini: {
     apiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
+  },
+
+  // QR Tracking Configuration
+  qrTracking: {
+    enabled: true,
+    defaultQuality: 'Standard',
+    maxWeight: 1000, // tons
+    supportedQualities: ['Premium', 'Standard', 'Low'],
+    pdfTemplate: import.meta.env.VITE_PDF_TEMPLATE_URL || '/templates/batch-report.html'
   },
 
   // App Configuration
